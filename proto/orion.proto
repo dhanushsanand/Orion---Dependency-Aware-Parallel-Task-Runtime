@@ -1,0 +1,43 @@
+// Orion cluster protocol. Mirrors include/orion/cluster/message.hpp 1:1.
+syntax = "proto3";
+package orion.rpc;
+
+message NodeInfo {
+  uint32 id   = 1;
+  string host = 2;
+  uint32 port = 3;
+}
+
+message Hello     { NodeInfo node = 1; }
+message Members   { repeated NodeInfo members = 1; }
+message Heartbeat { uint32 load = 1; }
+
+message TaskSpec {
+  uint64 id          = 1;
+  string fn          = 2;
+  repeated uint64 args = 3;
+  uint64 output      = 4;
+  uint32 submitter   = 5;
+}
+
+message GetObject  { uint64 object = 1; }
+message ObjectData { uint64 object = 1; bytes data = 2; }
+
+message Envelope {
+  uint32 from = 1;
+  oneof body {
+    Hello      hello       = 2;
+    Members    members     = 3;
+    Heartbeat  heartbeat   = 4;
+    TaskSpec   submit_task = 5;
+    GetObject  get_object  = 6;
+    ObjectData object_data = 7;
+  }
+}
+
+message Ack {}
+
+// Every node runs this service; a client-side stub per peer sends Envelopes.
+service Node {
+  rpc Send(Envelope) returns (Ack);
+}

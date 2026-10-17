@@ -1,0 +1,9 @@
+*.o
+*.a
+orion_node
+local_dag
+cluster_demo
+test_object_store
+test_dag
+test_cluster
+gen/
